@@ -1,8 +1,32 @@
+require 'erb'
+
+before "deploy:setup", "deploy:db:create_config"
+after 'deploy:setup', 'deploy:create_shared_config_dir'
+after "deploy:update_code", "deploy:db:symlink_config"
+
 namespace :deploy do
   namespace :db do
     desc "Runs rake db:create on remote server"
     task :create do
       run "cd #{current_path} && #{app_framework}_ENV=#{mongrel_environment} rake db:create"
+    end
+    
+    desc "Auto-generate production database.yml"
+    task :create_config do
+      db_config = ERB.new <<-EOF
+      production:
+        adapter: mysql
+        database: forward_fab_production
+        username: <%= db_user %>
+        password: <%= db_password %>
+        host: localhost
+      EOF
+      put db_config.result, "#{shared_config_path}/database.yml"
+    end
+    
+    desc "Create a symlink to the database yaml file"
+    task :symlink_config do
+      run "ln -s #{shared_config_path}/database.yml #{release_path}/config/database.yml"
     end
   end
 
@@ -23,12 +47,11 @@ namespace :deploy do
     stream "tail -f #{current_path}/log/#{app_environment}.log"
   end
   
-  after 'deploy:setup', 'deploy:create_config_dir'
-  task :create_config_dir do
-    run "mkdir -p #{shared_path}/config"
+  desc "Creates the shared config file directory"
+  task :create_shared_config_dir do
+    run "mkdir -p #{shared_config_path}"
   end
-
-  after "deploy:update_code", "deploy:copy_config_files"
+  
   desc "Copy production database.yml to live app"
   task :copy_config_files do    
     config_files.each do |file|
