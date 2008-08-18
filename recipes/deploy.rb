@@ -1,8 +1,10 @@
 require 'erb'
 
-before "deploy:setup", "deploy:db:create_config"
 after 'deploy:setup', 'deploy:create_shared_config_dir'
+after "deploy:setup", "deploy:db:create_config"
+after "deploy:setup", "deploy:set_file_permissions"
 after "deploy:update_code", "deploy:db:symlink_config"
+after "deploy:update_code", "deploy:build_photos_symlink"
 
 namespace :deploy do
   namespace :db do
@@ -17,8 +19,8 @@ namespace :deploy do
       production:
         adapter: mysql
         database: forward_fab_production
-        username: <%= db_user %>
-        password: <%= db_password %>
+        username: #{db_user}
+        password: #{db_password}
         host: localhost
       EOF
       put db_config.result, "#{shared_config_path}/database.yml"
@@ -57,5 +59,10 @@ namespace :deploy do
     config_files.each do |file|
       run "cp #{shared_path}/config/#{file} #{release_path}/config/"
     end
+  end
+  
+  desc "Builds a symlink from public/photos to the shared photos directory"
+  task :build_photos_symlink do
+    run "ln -s #{shared_path}/system/photos #{release_path}/public/photos"
   end
 end
