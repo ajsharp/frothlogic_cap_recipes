@@ -18,7 +18,7 @@ namespace :deploy do
       db_config = ERB.new <<-EOF
       production:
         adapter: mysql
-        database: forward_fab_production
+        database: #{db_name}
         username: #{db_user}
         password: #{db_password}
         host: localhost
