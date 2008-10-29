@@ -65,6 +65,7 @@ namespace :deploy do
   
   desc "Builds a symlink from public/photos to the shared photos directory"
   task :build_photos_symlink do
-    run "ln -s #{shared_path}/system/photos #{release_path}/public/photos"
+    run "mkdir -p #{shared_path}/system/photos"
+    run "ln -nfs #{shared_path}/system/photos #{release_path}/public/photos"
   end
 end
