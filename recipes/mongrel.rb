@@ -33,9 +33,14 @@ namespace :mongrel do
   Restart the Mongrel processes on the app server by starting and stopping the cluster. This uses the :use_sudo
   variable to determine whether to use sudo or not. By default, :use_sudo is set to true.
   DESC
-  task :restart , :roles => :app do
+  task :restart, :roles => :app do
     set_mongrel_conf
     run "mongrel_rails cluster::restart -C #{app_server_conf}"
+  end
+  
+  desc "does a sudo mongrel_cluster_ctl restart"
+  task :restart_all, :roles => :app do
+    sudo "mongrel_cluster_ctl restart"
   end
 
   desc <<-DESC
