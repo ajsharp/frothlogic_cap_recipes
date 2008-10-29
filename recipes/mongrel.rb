@@ -15,6 +15,8 @@ namespace :mongrel do
     argv << "-e #{app_environment}"
     argv << "-a #{app_server_address}"
     argv << "-c #{current_path}"
+    argv << "-l #{shared_path}/log/mongrel.log"
+    argv << "-P #{shared_path}/pids/mongrel.pid"
     argv << "-C #{app_server_conf}"
     cmd = argv.join " "
     sudo cmd
@@ -51,6 +53,11 @@ namespace :mongrel do
   task :stop , :roles => :app do
     set_mongrel_conf
     run "mongrel_rails cluster::stop -C #{app_server_conf}"
+  end
+  
+  desc "creates a symlink from 'current_path/config/mongrel_cluster.yml to shared_path/config/mongrel_cluster.yml"
+  task :create_config_file_symlink do
+    run "ln -nfs #{shared_config_path}/mongrel_cluster.yml #{release_path}/config/mongrel_cluster.yml"
   end
 
   def set_mongrel_conf
