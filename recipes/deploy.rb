@@ -29,7 +29,7 @@ namespace :deploy do
     
     desc "Create a symlink to the database yaml file"
     task :symlink_config do
-      run "ln -s #{shared_config_path}/database.yml #{release_path}/config/database.yml"
+      run "ln -nfs #{shared_config_path}/database.yml #{release_path}/config/database.yml"
     end
   end
 
