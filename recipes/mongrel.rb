@@ -37,7 +37,8 @@ namespace :mongrel do
   DESC
   task :restart, :roles => :app do
     set_mongrel_conf
-    run "mongrel_rails cluster::restart -C #{app_server_conf}"
+    run "mongrel_rails cluster::stop -C #{app_server_conf}"
+    run "mongrel_rails cluster::start -C #{app_server_conf}"
   end
   
   desc "does a sudo mongrel_cluster_ctl restart"
