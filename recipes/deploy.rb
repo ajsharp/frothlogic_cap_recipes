@@ -2,10 +2,10 @@ require 'erb'
 
 after 'deploy:setup', 'deploy:create_shared_config_dir'
 after "deploy:setup", "deploy:db:create_config"
-after "deploy:setup", "deploy:set_file_permissions"
+# after "deploy:setup", "deploy:set_file_permissions"
 after "deploy:update_code", "deploy:db:symlink_config"
-after "deploy:update_code", "deploy:build_photos_symlink"
 after "deploy:update_code", "mongrel:create_config_file_symlink"
+after "deploy:symlink", "deploy:build_public_symlinks"
 after "deploy:symlink", "mongrel:restart"
 
 namespace :deploy do
@@ -63,9 +63,10 @@ namespace :deploy do
     end
   end
   
-  desc "Builds a symlink from public/photos to the shared photos directory"
-  task :build_photos_symlink do
+  task :build_public_symlinks do
     run "mkdir -p #{shared_path}/system/photos"
     run "ln -nfs #{shared_path}/system/photos #{release_path}/public/photos"
+    run "mkdir -p #{shared_path}/system/videos"
+    run "ln -nfs #{shared_path}/system/videos #{release_path}/public/videos"
   end
 end
