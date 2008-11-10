@@ -56,13 +56,6 @@ namespace :deploy do
     run "mkdir -p #{shared_config_path}"
   end
   
-  desc "Copy production database.yml to live app"
-  task :copy_config_files do    
-    config_files.each do |file|
-      run "cp #{shared_path}/config/#{file} #{release_path}/config/"
-    end
-  end
-  
   task :build_public_symlinks do
     run "mkdir -p #{shared_path}/system/photos"
     run "ln -nfs #{shared_path}/system/photos #{release_path}/public/photos"
