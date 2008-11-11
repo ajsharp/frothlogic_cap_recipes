@@ -19,7 +19,7 @@ namespace :mongrel do
     argv << "-P #{shared_path}/pids/mongrel.pid"
     argv << "-C #{app_server_conf}"
     cmd = argv.join " "
-    sudo cmd
+    run cmd
   end
 
   desc <<-DESC
