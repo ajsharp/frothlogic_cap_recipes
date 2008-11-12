@@ -21,37 +21,6 @@ namespace :tools do
     end
   end
   
-  namespace :svn do
-    desc "remove and ignore log files and tmp from subversion"
-    task :clean do
-      logger.info "removing log directory contents from svn"
-      system "svn remove log/* --force"
-      logger.info "ignoring log directory"
-      system "svn propset svn:ignore '*.log' log/"
-      system "svn update log/"
-      logger.info "ignoring tmp directory"
-      system "svn propset svn:ignore '*' tmp/"
-      system "svn update tmp/"
-      logger.info "committing changes"
-      system "svn commit -m 'Removed and ignored log files and tmp'"
-    end
-
-    desc "Add new files to subversion"
-    task :add do
-      logger.info "Adding unknown files to svn"
-      system "svn status | grep '^\?' | sed -e 's/? *//' | sed -e 's/ /\ /g' | xargs svn add"
-    end
-    
-    desc "Commits changes to subversion repository"
-    task :commit do
-      puts "Enter log message:"
-      m = $stdin.gets.chomp
-      logger.info "Committing changes..."
-      system "svn commit -m #{m}"
-    end
-    
-  end
-  
   namespace :gems do
     
     task :default do
