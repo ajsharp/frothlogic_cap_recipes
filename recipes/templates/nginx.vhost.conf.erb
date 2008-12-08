@@ -1,4 +1,3 @@
-
 # from topfunky's peepserver plugin
 # http://topfunky.net/svn/plugins/peepserver
 upstream app_<%= application.gsub('.', '_') %> {
@@ -32,21 +31,6 @@ server {
     rewrite  ^(.*)$  /system/maintenance.html last;
     break;
   }
-
-  # Uncomment to Redirect all subdomains back to root domain
-  #if ($host !~ ^<%= application.gsub('.', '\.') %>$) {
-  #  rewrite ^.+ http://<%= application %>$uri permanent;
-  #  break;
-  #}
-
-  # Uncomment for FeedBurner redirects
-  # if ($http_user_agent !~ FeedBurner) {
-  #   rewrite ^/xml/rss/feed.xml$    http://feeds.feedburner.com/<%= application %> permanent;
-  #   rewrite ^/xml/rss20/feed.xml$  http://feeds.feedburner.com/<%= application %> permanent;
-  #   rewrite ^/xml/atom/feed.xml$   http://feeds.feedburner.com/<%= application %> permanent;
-  #   rewrite ^/xml/atom10/feed.xml$ http://feeds.feedburner.com/<%= application %> permanent;
-  #   break;
-  # }
 
   location / {
     # Uncomment to allow server side includes

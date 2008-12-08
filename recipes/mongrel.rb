@@ -22,7 +22,7 @@ namespace :mongrel do
     argv << "--group #{group}"
     argv << "-C #{app_server_conf}"
     cmd = argv.join " "
-    sudo cmd
+    run cmd
   end
 
   desc <<-DESC
