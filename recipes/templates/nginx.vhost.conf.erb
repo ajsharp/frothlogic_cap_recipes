@@ -17,7 +17,7 @@ server {
 
   # sets the domain[s] that this vhost server requests for.
   # None means listen to all.
-  server_name <%= domain %> <%= extra_domains.join(" ") %>;
+  server_name <%= domain %>;
 
   # doc root
   root <%= deploy_to %>/current/public;
