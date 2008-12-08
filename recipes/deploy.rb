@@ -56,10 +56,11 @@ namespace :deploy do
     run "mkdir -p #{shared_config_path}"
   end
   
+  # These symlink any project-specific directories that need to be consistent between deploys (file upload directories, etc)
   task :build_public_symlinks do
-    run "mkdir -p #{shared_path}/system/photos"
-    run "ln -nfs #{shared_path}/system/photos #{release_path}/public/photos"
-    run "mkdir -p #{shared_path}/system/videos"
-    run "ln -nfs #{shared_path}/system/videos #{release_path}/public/videos"
+    public_symlink_dirs.each do |dir|
+      run "mkdir -p #{shared_path}/system/#{dir}"
+      run "ln -nfs #{shared_path}/system/#{dir} #{release_path}/public/#{dir}"
+    end unless public_symlink_dirs.nil?
   end
 end
