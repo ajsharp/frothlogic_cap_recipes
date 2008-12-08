@@ -75,8 +75,8 @@ task :production do
   set :app_servers, 2
   set :app_server_port, 8000
   
-  # database options
-  db = @settings['database']['staging']
+  # database options 
+  db = @settings['database']['production']
   set :db_name, db['name']
   set :db_user, db['username']
   set :db_password, db['password']
