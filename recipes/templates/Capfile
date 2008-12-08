@@ -1,63 +1,86 @@
 require 'capistrano/version'
+require 'yaml'
 load 'deploy' if respond_to?(:namespace) # cap2 differentiator
 Dir['vendor/plugins/*/recipes/*.rb'].each { |plugin| load(plugin) }
 
-# =============================================================
+# custom settings file - THIS FILE SHOULD BE IGNORED BY SOURCE CODE CONTROL!
+settings_file = 'config/deploy.yml'
+@settings = YAML.load_file(settings_file) if File.exist?(settings_file)
 
-# General configuration settings, required for all recipes!
-set :application, "project-name"
-set :domain, "project-domain"
-set :extra_domains, %w() # Add something like www.project-domain.com
-role :app, domain
-role :web, domain
-role :db,  domain, :primary => true
+def finalize_setup
+  # roles
+  role :app, deploy_server
+  role :web, deploy_server
+  role :db,  deploy_server, :primary => true
+  
+  # ssh options
+  default_run_options[:pty] = true
+  set :ssh_port, 22
+  set :port, 22
+  
+  # repository options
+  set :repository,  "ssh://#{user}@GIT_IP_ADDRESS:#{port}/home/#{user}/git_repos/#{application}.git"
+  set :deploy_to, "/home/#{user}/public_html/#{application}"
+  set :scm, :git
+  set :deploy_via, :remote_cache
+  
+  # app server options 
+  set :app_server, :mongrel
+  set :app_framework, :rails
+  set :app_server_address, '127.0.0.1'
+  set :app_server_conf, "#{shared_path}/config/mongrel_cluster.yml"
+  set :app_environment, 'production'
+  
+  # http server options
+  set :nginx_sites_available, "/etc/nginx/sites-available"
+  set :nginx_sites_enabled,   "/etc/nginx/sites-enabled"
+  
+  # other miscellaneous options (used throughout project)
+  set :shared_config_path, "/home/#{user}/public_html/#{application}/shared/config"
+  set :public_symlink_dirs, ['photos', 'videos'] # relative to /#{release_path}/public
+end
 
-# set :user, "user"
+task :staging do
+  set :application, "www.example.com"
+  set :domain, "staging.example.com"
+  set :user, "USER"
+  set :deploy_server, "123.456.78.91"
+  
+  # extra git options
+  set :branch, 'development'
+  
+  # app server options
+  set :app_servers, 1
+  set :app_server_port, 8004
+  
+  # database options
+  db = @settings['database']['staging']
+  set :db_name, db['name']
+  set :db_user, db['username']
+  set :db_password, db['password']
+  
+  finalize_setup
+end
 
-# Deployment Settings
-set :repository,  "repository url"
-set :deploy_to, "/absolute/path/to/location/your/server"
-set :deploy_via, :checkout
-set :config_files, %w()
+task :production do
+  set :application, "www.example.com"
+  set :domain, "example.com"
+  set :user, "USER"
+  set :deploy_server, "123.456.78.91"
+  
+  # extra git options
+  set :branch, 'development'
+  
+  # app server options
+  set :app_servers, 2
+  set :app_server_port, 8000
+  
+  # database options
+  db = @settings['database']['staging']
+  set :db_name, db['name']
+  set :db_user, db['username']
+  set :db_password, db['password']
+  
+  finalize_setup
+end
 
-# SSH Keys for caching (you must generate these first.)
-ssh_options[:keys] = %w(~/.ssh/mykey1 ~/.ssh/mykey2)
-
-# Change this to :thin if you want to use Thin instead.
-set :app_server, :mongrel
-
-# Change this to :merb if you want to use Merb instead. (experimental)
-set :app_framework, :rails
-
-# =============================================================
-# Application Server Settings (Thin or Mongrel)
-# =============================================================
-set :app_servers, 1
-set :app_server_port, 7007
-set :app_environment, 'production'
-set :app_server_address, '127.0.0.1'
-set :app_server_conf, "#{shared_path}/config/thin.yml"
-
-# =============================================================
-# Nginx Settings
-# =============================================================
-set :nginx_sites_available, "/usr/local/nginx/sites-available"
-set :nginx_sites_enabled, "/usr/local/nginx/sites-enabled"
-
-# =============================================================
-# Apache Settings
-# =============================================================
-set :apache_server_name, nil
-set :apache_conf, "/usr/local/apache2/conf/apps/#{application}.conf"
-# set :apache_default_vhost, false
-# set :apache_default_vhost_conf, nil
-set :apache_ctl, "/usr/local/apache2/bin/apachectl"
-set :apache_server_aliases, []
-set :apache_proxy_port, mongrel_port
-set :apache_proxy_servers, mongrel_servers
-set :apache_proxy_address, mongrel_address
-# set :apache_ssl_enabled, false
-# set :apache_ssl_ip, nil
-# set :apache_ssl_forward_all, false
-# set :apache_ssl_chainfile, false
-set :local_apache_ctl_path, apache_ctl
