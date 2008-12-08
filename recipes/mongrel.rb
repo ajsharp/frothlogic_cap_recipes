@@ -7,7 +7,7 @@ namespace :mongrel do
   DESC
   task :configure, :roles => :app do
     set_mongrel_conf
-    
+
     argv = []
     argv << "mongrel_rails cluster::configure"
     argv << "-N #{app_servers.to_s}"
@@ -17,6 +17,9 @@ namespace :mongrel do
     argv << "-c #{current_path}"
     argv << "-l #{shared_path}/log/mongrel.log"
     argv << "-P #{shared_path}/pids/mongrel.pid"
+    argv << "--user #{user}"
+    group ||= user
+    argv << "--group #{group}"
     argv << "-C #{app_server_conf}"
     cmd = argv.join " "
     sudo cmd
