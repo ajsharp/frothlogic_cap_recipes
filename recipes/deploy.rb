@@ -12,7 +12,7 @@ namespace :deploy do
   namespace :db do
     desc "Runs rake db:create on remote server"
     task :create do
-      run "cd #{current_path} && #{app_framework}_ENV=#{mongrel_environment} rake db:create"
+      run "cd #{current_path} && #{app_framework}_ENV=#{app_environment} rake db:create"
     end
     
     desc "Auto-generate production database.yml"

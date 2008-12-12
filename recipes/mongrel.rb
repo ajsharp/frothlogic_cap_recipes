@@ -19,7 +19,7 @@ namespace :mongrel do
     argv << "-P #{shared_path}/pids/mongrel.pid"
     argv << "--user #{user}"
     group ||= user
-    argv << "--group #{group}"
+    argv << "--group #{app_server_group}"
     argv << "-C #{app_server_conf}"
     cmd = argv.join " "
     run cmd
