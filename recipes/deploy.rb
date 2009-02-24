@@ -4,9 +4,9 @@ after 'deploy:setup', 'deploy:create_shared_config_dir'
 after "deploy:setup", "deploy:db:create_config"
 # after "deploy:setup", "deploy:set_file_permissions"
 after "deploy:update_code", "deploy:db:symlink_config"
-after "deploy:update_code", "mongrel:create_config_file_symlink"
+# after "deploy:update_code", "mongrel:create_config_file_symlink"
 after "deploy:symlink", "deploy:build_public_symlinks"
-after "deploy:symlink", "mongrel:restart"
+after "deploy:symlink", "deploy:restart"
 
 namespace :deploy do
   namespace :db do
