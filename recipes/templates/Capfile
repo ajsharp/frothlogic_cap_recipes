@@ -77,7 +77,7 @@ task :production do
   
   # database options 
   db = @settings['database']['production']
-  set :db_name, db['name']
+  set :db_name, db['database']
   set :db_user, db['username']
   set :db_password, db['password']
   
