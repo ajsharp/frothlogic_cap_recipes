@@ -25,10 +25,32 @@ namespace :deploy do
       sudo "#{apache_ctl} reload"
     end
     
-    desc "Configure virtual server on remote app."
-    task :setup do
-      logger.info "generating .conf file"
-      template_file = %q{
+    namespace :passenger do
+      desc "Create a passenger virtual host file"
+      task :setup do
+        logger.info "generating #{application}.conf file"
+        template_file = %q{
+<VirtualHost *:80>
+  ServerName <%= application %>
+  DocumentRoot <%= deploy_to %>/public
+</VirtualHost>
+}
+        require 'erb'
+        
+        config = ERB.new(template_file)
+        put config.result(binding), "#{application}.conf"
+        logger.info "placing #{application}.conf on remote server"
+        sudo "mv #{application}.conf #{apache_sites_available}"
+        sudo "chown root:root #{apache_sites_available}/#{application}.conf"
+        #sudo "chmod 775 #{apache_conf}"
+      end
+    end
+
+    namespace :mongrel do
+      desc "Configure virtual server on remote app."
+      task :setup do
+        logger.info "generating .conf file"
+        template_file = %q{
 <VirtualHost *:80>
   ServerName <%= domain %>
   ServerAlias www.<%= domain %>
@@ -81,14 +103,15 @@ namespace :deploy do
 </VirtualHost>
 }
       
-      require 'erb'
-      
-      config = ERB.new(template_file)
-      put config.result(binding), "#{application}.conf"
-      logger.info "placing #{application}.conf on remote server"
-      sudo "mv #{application}.conf #{apache_conf}"
-      sudo "chown deploy:users #{apache_conf}"
-      sudo "chmod 775 #{apache_conf}"
+        require 'erb'
+        
+        config = ERB.new(template_file)
+        put config.result(binding), "#{application}.conf"
+        logger.info "placing #{application}.conf on remote server"
+        sudo "mv #{application}.conf #{apache_sites_available}"
+        sudo "chown root:root #{apache_sites_available}/#{application}.conf"
+        sudo "chmod 775 #{apache_conf}"
+      end
     end
   end
 end
