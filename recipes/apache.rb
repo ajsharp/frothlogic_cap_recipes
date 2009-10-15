@@ -32,7 +32,7 @@ namespace :deploy do
         template_file = %q{
 <VirtualHost *:80>
   ServerName <%= application %>
-  DocumentRoot <%= deploy_to %>/public
+  DocumentRoot <%= deploy_to %>/current/public
 </VirtualHost>
 }
         require 'erb'
