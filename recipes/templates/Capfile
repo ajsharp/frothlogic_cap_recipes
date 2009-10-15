@@ -34,6 +34,9 @@ def finalize_setup
   # http server options
   set :nginx_sites_available, "/etc/nginx/sites-available"
   set :nginx_sites_enabled,   "/etc/nginx/sites-enabled"
+
+  set :apache_sites_available, "/etc/apache2/sites-available"
+  set :apache_sites_enabled, "/etc/apache2/sites-enabled";
   
   # other miscellaneous options (used throughout project)
   set :shared_config_path, "/home/#{user}/public_html/#{application}/shared/config"
